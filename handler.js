@@ -1,26 +1,30 @@
 'use strict';
 const db = require('./app/config/db');
-const InventoryController = require('./app/controllers/inventory.controller');
+const send = require('./app/utils/response');
+
+const InventoryController = require('./app/controllers/inventory');
 
 module.exports.editInventory = async (event) => {
   const { body } = event;
-  const inventory = await InventoryController.updateInventory(JSON.parse(body));
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(inventory),
-  };
+  try {
+    const inventory = await InventoryController.updateInventory(
+      JSON.parse(body)
+    );
+    return send(inventory);
+  } catch (e) {
+    return send(e, 500);
+  }
 };
 
 module.exports.getInventoryCount = async (event) => {
-  let inventory = await InventoryController.getInventory(
-    event.pathParameters.sku
-  );
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ count: inventory ? inventory.quantity : 0 }),
-  };
+  try {
+    const inventory = await InventoryController.getInventoryCount(
+      event.pathParameters.sku
+    );
+    send(inventory);
+  } catch (e) {
+    send(e, 500);
+  }
 };
 
 // module.exports.snsLamdbaTriggered = (event, context, callback) => {
